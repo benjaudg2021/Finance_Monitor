@@ -31,3 +31,5 @@ def monitorear_accion(ticket_simbolo):
 if __name__ == "__main__":
     # Puedes cambiar 'MSTR' por cualquier otro ticker como 'TSLA' o 'AAPL'
     monitorear_accion("MSTR")
+
+    #develop try 2 comment
