@@ -11,6 +11,10 @@ import time
 from datetime import datetime
 
 def monitorear_accion(ticket_simbolo):
+    # ticket_simbolo podría ser:
+    # "MSTR" para NYSE
+    # "MSTR.MX" para BMV
+    accion = yf.Ticker(ticket_simbolo)
     print(f"--- Iniciando monitoreo de {ticket_simbolo} ---")
     
     try:
