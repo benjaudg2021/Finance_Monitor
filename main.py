@@ -32,10 +32,4 @@ if __name__ == "__main__":
     # Puedes cambiar 'MSTR' por cualquier otro ticker como 'TSLA' o 'AAPL'
     monitorear_accion("MSTR")
 
-
-#comentario linea 36 develop 1
-
-    #comentario linea 32 develop 2
-   
-
-   #COMENDARIO HECHO EN LINEA 37 EN BRANCH 3
+#eliminacion de comentarios creados desde las originales 3 branches de prueba
