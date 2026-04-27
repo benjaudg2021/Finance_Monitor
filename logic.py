@@ -28,8 +28,8 @@ def monitorear_accion(ticket_simbolo):
             # 4. Mostrar el resultado
             print(f"[{ahora}] Precio de {ticket_simbolo}: ${precio_actual:.2f}")
             
-            # 5. Pausa de 1 minuto (60 segundos)
-            time.sleep(60)
+            # 5. Pausa de 30 segundos
+            time.sleep(30)
             
     except KeyboardInterrupt:
         print("\nMonitoreo detenido por el usuario.")
