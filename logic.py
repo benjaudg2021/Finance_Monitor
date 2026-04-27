@@ -1,3 +1,11 @@
+'''
+Goal del development es tener una interfaz grafica que obetenga el valor de la accion listada y poder visualizarla en tiempo real con un refresque elegido:
+cada 5 segundos, 15, 30, 60, 5 min, 10, 15, etc.
+Ademas de la lsita de acciones, y seteo del refresque de info, la app sera capaz de notificar ciertos casos, como cuando la accion alcance cierto valor
+Interfaz grafica dirigida a Samsung Galaxy watch 6 classic
+'''
+
+
 import yfinance as yf
 import time
 from datetime import datetime
