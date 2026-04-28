@@ -10,6 +10,56 @@ import yfinance as yf
 import time
 from datetime import datetime
 
+def obtener_precio(simbolo):
+    """
+    Obtiene el precio actual de un símbolo.
+    Retorna (precio, cambio, cambio_porcentaje) o (None, None, None) si falla.
+    """
+    try:
+        print(f"    [DEBUG] Obteniendo {simbolo}...", end=" ", flush=True)
+        
+        # Descargar datos históricos
+        hist = yf.download(simbolo, period='5d', progress=False)
+        
+        # Validar que tenemos datos
+        if hist is None or len(hist) == 0:
+            print("vacío")
+            return None, None, None
+        
+        # Obtener el último cierre - usar .item() para obtener valor escalar
+        try:
+            precio_actual = hist['Close'].iloc[-1].item()
+        except:
+            precio_actual = hist['Close'].iloc[-1]
+        
+        # Validar que es un número válido
+        if precio_actual is None or precio_actual != precio_actual:  # NaN check
+            print("NaN/None")
+            return None, None, None
+        
+        precio_actual = float(precio_actual)
+        
+        # Calcular cambio
+        if len(hist) >= 2:
+            try:
+                cierre_anterior = hist['Close'].iloc[-2].item()
+            except:
+                cierre_anterior = hist['Close'].iloc[-2]
+            
+            cierre_anterior = float(cierre_anterior)
+            cambio = precio_actual - cierre_anterior
+            cambio_pct = (cambio / cierre_anterior * 100) if cierre_anterior != 0 else 0
+        else:
+            cambio = 0
+            cambio_pct = 0
+        
+        print("✓")
+        return precio_actual, cambio, cambio_pct
+        
+    except Exception as e:
+        print(f"ERROR: {type(e).__name__}: {str(e)[:40]}")
+        return None, None, None
+
 def monitorear_acciones(simbolos):
     """
     Monitorea múltiples acciones e índices simultáneamente.
@@ -31,24 +81,17 @@ def monitorear_acciones(simbolos):
             # Obtener datos de todos los símbolos
             for simbolo in simbolos:
                 try:
-                    accion = yf.Ticker(simbolo)
-                    datos = accion.fast_info
-                    precio_actual = datos.get('last_price', 'N/A')
+                    precio, cambio, cambio_pct = obtener_precio(simbolo)
                     
-                    # Obtener información adicional
-                    cambio = datos.get('dayChange', 'N/A')
-                    cambio_porcentaje = datos.get('dayChangePercent', 'N/A')
-                    
-                    # Formatear la salida
-                    if isinstance(precio_actual, (int, float)):
-                        print(f"  {simbolo:15} → ${precio_actual:10.2f}", end="")
-                        if isinstance(cambio, (int, float)) and isinstance(cambio_porcentaje, (int, float)):
+                    if precio is not None:
+                        print(f"  {simbolo:15} → ${precio:10.2f}", end="")
+                        if cambio is not None and cambio_pct is not None:
                             signo = "+" if cambio >= 0 else ""
-                            print(f"  ({signo}{cambio:7.2f} | {signo}{cambio_porcentaje:6.2f}%)")
+                            print(f"  ({signo}{cambio:7.2f} | {signo}{cambio_pct:6.2f}%)")
                         else:
                             print()
                     else:
-                        print(f"  {simbolo:15} → Error obteniendo datos")
+                        print(f"  {simbolo:15} → ⚠️ No se pudo obtener datos")
                         
                 except Exception as e:
                     print(f"  {simbolo:15} → Error: {str(e)[:40]}")
