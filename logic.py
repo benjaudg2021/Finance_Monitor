@@ -10,38 +10,72 @@ import yfinance as yf
 import time
 from datetime import datetime
 
-def monitorear_accion(ticket_simbolo):
-    # ticket_simbolo podría ser:
-    # "MSTR" para NYSE
-    # "MSTR.MX" para BMV
-    accion = yf.Ticker(ticket_simbolo)
-    print(f"--- Iniciando monitoreo de {ticket_simbolo} ---")
+def monitorear_acciones(simbolos):
+    """
+    Monitorea múltiples acciones e índices simultáneamente.
+    
+    Args:
+        simbolos (list): Lista de símbolos a monitorear
+    """
+    print(f"--- Iniciando monitoreo de {len(simbolos)} activos ---")
+    print(f"Activos: {', '.join(simbolos)}")
+    print("Actualizando cada 30 segundos...\n")
     
     try:
         while True:
-            # 1. Obtener los datos de la acción
-            accion = yf.Ticker(ticket_simbolo)
-            
-            # 2. Extraer el precio actual (usamos 'fast_info' para velocidad)
-            datos = accion.fast_info
-            precio_actual = datos['last_price']
-            
-            # 3. Obtener la hora actual
             ahora = datetime.now().strftime("%H:%M:%S")
+            print(f"\n{'='*70}")
+            print(f"[{ahora}] ACTUALIZACIÓN DE PRECIOS")
+            print(f"{'='*70}")
             
-            # 4. Mostrar el resultado
-            print(f"[{ahora}] Precio de {ticket_simbolo}: ${precio_actual:.2f}")
+            # Obtener datos de todos los símbolos
+            for simbolo in simbolos:
+                try:
+                    accion = yf.Ticker(simbolo)
+                    datos = accion.fast_info
+                    precio_actual = datos.get('last_price', 'N/A')
+                    
+                    # Obtener información adicional
+                    cambio = datos.get('dayChange', 'N/A')
+                    cambio_porcentaje = datos.get('dayChangePercent', 'N/A')
+                    
+                    # Formatear la salida
+                    if isinstance(precio_actual, (int, float)):
+                        print(f"  {simbolo:15} → ${precio_actual:10.2f}", end="")
+                        if isinstance(cambio, (int, float)) and isinstance(cambio_porcentaje, (int, float)):
+                            signo = "+" if cambio >= 0 else ""
+                            print(f"  ({signo}{cambio:7.2f} | {signo}{cambio_porcentaje:6.2f}%)")
+                        else:
+                            print()
+                    else:
+                        print(f"  {simbolo:15} → Error obteniendo datos")
+                        
+                except Exception as e:
+                    print(f"  {simbolo:15} → Error: {str(e)[:40]}")
             
-            # 5. Pausa de 30 segundos
+            # Pausa de 30 segundos
+            print(f"\nPróxima actualización en 30 segundos...")
             time.sleep(30)
             
     except KeyboardInterrupt:
-        print("\nMonitoreo detenido por el usuario.")
+        print("\n\nMonitoreo detenido por el usuario.")
     except Exception as e:
-        print(f"Ocurrió un error: {e}")
+        print(f"Ocurrió un error general: {e}")
 
 if __name__ == "__main__":
-    # Puedes cambiar 'MSTR' por cualquier otro ticker como 'TSLA' o 'AAPL'
-    monitorear_accion("MSTR")
+    # Lista de símbolos a monitorear
+    simbolos = [
+        "MSTR",      # MicroStrategy
+        "F",         # Ford Motor Company
+        "GM",        # General Motors
+        "RIVN",      # Rivian
+        "MARA",      # Marathon Digital Holdings
+        "NVDA",      # NVIDIA
+        "AMZN",      # Amazon
+        "WMT",       # Walmart
+        "^IXIC",     # NASDAQ Composite
+        "^GSPC"      # S&P 500
+    ]
+    
+    monitorear_acciones(simbolos)
 
-#eliminacion de comentarios creados desde las originales 3 branches de prueba
